@@ -115,7 +115,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		if ( empty( $installed_plugins ) ) {
 
 			if ( is_wp_error( $api ) ) {
-				return WP_Error( $api->get_error_code(), $api->get_error_message() );
+				return new WP_Error( $api->get_error_code(), $api->get_error_message() );
 			}
 
 			$skin     = new WP_Ajax_Upgrader_Skin();
@@ -124,30 +124,30 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$filesystem_method = get_filesystem_method();
 
 			if ( 'direct' !== $filesystem_method ) {
-				return WP_Error( null, 'Only direct FS_METHOD is supported.' );
+				return new WP_Error( null, 'Only direct FS_METHOD is supported.' );
 			}
 
 			$result = $upgrader->install( $api->download_link );
 
 			if ( is_wp_error( $result ) ) {
-				return WP_Error( $result->get_error_code(), $result->get_error_message() );
+				return new WP_Error( $result->get_error_code(), $result->get_error_message() );
 			}
 
 			if ( is_wp_error( $skin->result ) ) {
-				return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
+				return new WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
 			}
 
 			if ( $skin->get_errors()->has_errors() ) {
-				return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
+				return new WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
 			}
 
 			if ( is_null( $result ) ) {
 				global $wp_filesystem;
 				// Pass through the error from WP_Filesystem if one was raised.
 				if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
-					return WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
+					return new WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
 				}
-				return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
+				return new WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
 			}
 		}
 
@@ -156,7 +156,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$activate_result = activate_plugin( $install_status['file'] );
 
 		if ( is_wp_error( $activate_result ) ) {
-			return WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
+			return new WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
 		}
 
 		return rest_ensure_response( array( 'success' => true ) );
@@ -188,7 +188,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		);
 
 		if ( is_wp_error( $api ) ) {
-			return WP_Error( $api->get_error_code(), $api->get_error_message() );
+			return new WP_Error( $api->get_error_code(), $api->get_error_message() );
 		}
 
 		$install_status = install_plugin_install_status( $api );
@@ -196,13 +196,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$deactivate_result = deactivate_plugins( $install_status['file'] );
 
 		if ( is_wp_error( $deactivate_result ) ) {
-			return WP_Error( $deactivate_result->get_error_code(), $deactivate_result->get_error_message() );
+			return new WP_Error( $deactivate_result->get_error_code(), $deactivate_result->get_error_message() );
 		}
 
 		$delete_result = delete_plugins( array( $install_status['file'] ) );
 
 		if ( is_wp_error( $delete_result ) ) {
-			return WP_Error( $delete_result->get_error_code(), $delete_result->get_error_message() );
+			return new WP_Error( $delete_result->get_error_code(), $delete_result->get_error_message() );
 		}
 
 		return rest_ensure_response( true );
