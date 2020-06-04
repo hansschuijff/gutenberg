@@ -135,7 +135,6 @@ export class PostSavedState extends Component {
 				className="editor-post-save-draft"
 				onClick={ () => onSave() }
 				shortcut={ displayShortcut.primary( 's' ) }
-				isTertiary
 			>
 				{ label }
 			</Button>
